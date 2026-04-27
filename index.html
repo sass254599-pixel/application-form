@@ -4,58 +4,61 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>แบบฟอร์มสมัครเข้ารับการฝึกอบรม</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Sarabun',sans-serif;background:#f4f6f9;color:#1a1a2e;font-size:14px;padding:20px}
-  .container{max-width:720px;margin:0 auto;background:#fff;border-radius:12px;box-shadow:0 2px 16px rgba(0,0,0,.1);overflow:hidden}
-  .header{background:linear-gradient(135deg,#1a3a6b,#1a5c96);color:#fff;padding:24px 28px}
-  .header h1{font-size:18px;font-weight:600;margin-bottom:4px}
-  .header p{font-size:12px;opacity:.8}
+  body{font-family:'Sarabun',sans-serif;background:#f0f4f8;color:#1a1a2e;font-size:14px;padding:20px}
+  .container{max-width:740px;margin:0 auto;background:#fff;border-radius:14px;box-shadow:0 4px 24px rgba(0,0,0,.12);overflow:hidden}
+  .header{background:linear-gradient(135deg,#0d2b5e,#1a5c96);color:#fff;padding:22px 28px;display:flex;align-items:center;gap:16px}
+  .header-logo{width:52px;height:52px;flex-shrink:0;opacity:.92}
+  .header-text h1{font-size:17px;font-weight:700;margin-bottom:3px}
+  .header-text p{font-size:11.5px;opacity:.75}
   .body{padding:24px 28px}
-  .prog-wrap{display:flex;align-items:center;gap:0;margin-bottom:24px}
+  .prog-wrap{display:flex;align-items:center;gap:0;margin-bottom:26px}
   .prog-step{flex:1;text-align:center;position:relative}
   .prog-step:not(:last-child)::after{content:'';position:absolute;top:13px;left:50%;width:100%;height:2px;background:#e2e8f0;z-index:0}
   .prog-step.done:not(:last-child)::after{background:#1a5c96}
-  .prog-dot{width:26px;height:26px;border-radius:50%;background:#e2e8f0;color:#94a3b8;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;margin:0 auto 4px;position:relative;z-index:1;transition:all .3s}
+  .prog-dot{width:26px;height:26px;border-radius:50%;background:#e2e8f0;color:#94a3b8;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 4px;position:relative;z-index:1;transition:all .3s}
   .prog-step.done .prog-dot{background:#1a5c96;color:#fff}
+  .prog-step.active .prog-dot{background:#0d2b5e;color:#fff;box-shadow:0 0 0 3px rgba(26,92,150,.2)}
   .prog-label{font-size:10px;color:#94a3b8}
-  .prog-step.done .prog-label{color:#1a5c96;font-weight:500}
+  .prog-step.done .prog-label,.prog-step.active .prog-label{color:#1a5c96;font-weight:600}
   .step{display:none}.step.active{display:block}
-  .step-title{font-size:16px;font-weight:600;color:#1a3a6b;margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid #e8f0f8}
-  .sec-label{font-size:11px;font-weight:600;color:#64748b;letter-spacing:.07em;text-transform:uppercase;margin:16px 0 8px;padding-bottom:5px;border-bottom:1px solid #f1f5f9}
+  .step-title{font-size:15.5px;font-weight:700;color:#0d2b5e;margin-bottom:16px;padding-bottom:9px;border-bottom:2.5px solid #dde9f5}
+  .sec-label{font-size:10.5px;font-weight:700;color:#1a5c96;letter-spacing:.08em;text-transform:uppercase;margin:18px 0 9px;padding-bottom:5px;border-bottom:1px solid #e8f0f8;background:linear-gradient(90deg,#f0f6ff,transparent);padding:4px 8px;border-radius:4px}
   .grid{display:grid;gap:12px;margin-bottom:4px}
   .g1{grid-template-columns:1fr}
   .g2{grid-template-columns:1fr 1fr}
   .g3{grid-template-columns:1fr 1fr 1fr}
   .field{display:flex;flex-direction:column;gap:4px}
-  .field label{font-size:12px;color:#475569;font-weight:500}
+  .field label{font-size:12px;color:#374151;font-weight:600}
   .field input,.field select,.field textarea{
-    width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;
-    background:#fafafa;color:#1a1a2e;font-size:13px;font-family:'Sarabun',sans-serif;
+    width:100%;padding:8px 11px;border:1.5px solid #e2e8f0;border-radius:8px;
+    background:#fafbfc;color:#1a1a2e;font-size:13px;font-family:'Sarabun',sans-serif;
     transition:border-color .2s,box-shadow .2s
   }
-  .field textarea{resize:vertical;min-height:64px}
+  .field textarea{resize:vertical;min-height:68px}
   .field input:focus,.field select:focus,.field textarea:focus{
     outline:none;border-color:#1a5c96;background:#fff;box-shadow:0 0 0 3px rgba(26,92,150,.1)
   }
   .other-input{margin-top:6px;display:none}
   .other-input.show{display:block}
   .err{font-size:11px;color:#dc2626;display:none;margin-top:2px}
-  .row{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid #f1f5f9}
-  .btn{padding:8px 20px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;color:#475569;font-size:13px;cursor:pointer;font-family:'Sarabun',sans-serif;font-weight:500;transition:all .2s}
-  .btn:hover{background:#f8fafc}
+  .row{display:flex;gap:8px;justify-content:flex-end;margin-top:22px;padding-top:16px;border-top:1px solid #f0f4f8}
+  .btn{padding:9px 22px;border-radius:8px;border:1.5px solid #e2e8f0;background:#fff;color:#475569;font-size:13px;cursor:pointer;font-family:'Sarabun',sans-serif;font-weight:600;transition:all .2s}
+  .btn:hover{background:#f8fafc;border-color:#cbd5e1}
   .btn.pri{background:#1a5c96;color:#fff;border-color:#1a5c96}
   .btn.pri:hover{background:#154d80}
   .btn.grn{background:#15803d;color:#fff;border-color:#15803d}
   .btn.grn:hover{background:#166534}
   .btn:disabled{opacity:.5;cursor:not-allowed}
   .sum-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px;margin-bottom:12px}
-  .sum-card h3{font-size:11px;font-weight:600;color:#1a5c96;margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em}
+  .sum-card h3{font-size:11px;font-weight:700;color:#1a5c96;margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em}
   .sum-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid #f1f5f9;font-size:12px;gap:8px}
   .sum-row:last-child{border-bottom:none}
   .sum-row .lb{color:#64748b;white-space:nowrap;flex-shrink:0}
-  .sum-row .vl{font-weight:500;text-align:right;word-break:break-word}
-  .toast{border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;display:none;font-weight:500}
+  .sum-row .vl{font-weight:600;text-align:right;word-break:break-word}
+  .toast{border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;display:none;font-weight:600}
   .toast.ok{background:#dcfce7;color:#166534;border:1px solid #bbf7d0}
   .toast.er{background:#fee2e2;color:#991b1b;border:1px solid #fecaca}
   .toast.show{display:block}
@@ -69,22 +72,38 @@
 
 <div class="container">
   <div class="header">
-    <h1>แบบฟอร์มสมัครเข้ารับการฝึกอบรม</h1>
-    <p>กรุณากรอกข้อมูลให้ครบถ้วนก่อนส่งใบสมัคร</p>
+    <!-- Army Supply NCO Badge SVG -->
+    <svg class="header-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2"/>
+      <circle cx="50" cy="50" r="38" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+      <!-- Torch flame -->
+      <ellipse cx="50" cy="22" rx="6" ry="10" fill="#FFD700" opacity="0.9"/>
+      <ellipse cx="50" cy="26" rx="3.5" ry="6" fill="#FF8C00" opacity="0.8"/>
+      <!-- Torch handle -->
+      <rect x="47" y="30" width="6" height="18" rx="2" fill="rgba(255,255,255,0.8)"/>
+      <!-- Star -->
+      <polygon points="50,48 52,54 58,54 53,58 55,64 50,60 45,64 47,58 42,54 48,54" fill="#FFD700" opacity="0.95"/>
+      <!-- Circular text arc hint -->
+      <text x="50" y="88" text-anchor="middle" font-size="7" fill="rgba(255,255,255,0.7)" font-family="Sarabun,sans-serif" font-weight="600">ส่งกำลังบำรุง</text>
+    </svg>
+    <div class="header-text">
+      <h1>ใบสมัครเข้ารับการฝึกอบรม</h1>
+      <p>หลักสูตรนายสิบส่งกำลังบำรุง รุ่นที่ 6 ปีงบประมาณ 2569<br>กรุณากรอกข้อมูลให้ครบถ้วนก่อนส่งใบสมัคร</p>
+    </div>
   </div>
   <div class="body">
 
     <!-- Progress -->
     <div class="prog-wrap">
-      <div class="prog-step done" id="ps0"><div class="prog-dot">1</div><div class="prog-label">ส่วนตัว</div></div>
+      <div class="prog-step done active" id="ps0"><div class="prog-dot">1</div><div class="prog-label">ส่วนตัว</div></div>
       <div class="prog-step" id="ps1"><div class="prog-dot">2</div><div class="prog-label">หน่วย</div></div>
-      <div class="prog-step" id="ps2"><div class="prog-dot">3</div><div class="prog-label">การศึกษา</div></div>
+      <div class="prog-step" id="ps2"><div class="prog-dot">3</div><div class="prog-label">ติดต่อ/ศึกษา</div></div>
       <div class="prog-step" id="ps3"><div class="prog-dot">4</div><div class="prog-label">ยืนยัน</div></div>
     </div>
 
-    <!-- STEP 1 -->
+    <!-- STEP 1 ข้อมูลส่วนตัว -->
     <div class="step active" id="s0">
-      <div class="step-title">ข้อมูลส่วนตัว</div>
+      <div class="step-title">📋 ข้อมูลส่วนตัว</div>
       <div class="sec-label">ข้อมูลพื้นฐาน</div>
       <div class="grid g2">
         <div class="field">
@@ -181,19 +200,19 @@
       </div>
     </div>
 
-    <!-- STEP 2 -->
+    <!-- STEP 2 หน่วย -->
     <div class="step" id="s1">
-      <div class="step-title">ข้อมูลหน่วยและตำแหน่ง</div>
+      <div class="step-title">🏢 ข้อมูลหน่วยและตำแหน่ง</div>
       <div class="sec-label">สังกัด</div>
       <div class="grid g2">
         <div class="field">
           <label>สังกัด (กรม/กองพัน) *</label>
-          <input id="unit_main" placeholder="เช่น กรม ทพ.43">
+          <input id="unit_main" placeholder="เช่น กรม ทพ.11">
           <div class="err" id="e_unit_main">กรุณากรอกสังกัด</div>
         </div>
         <div class="field">
           <label>หน่วยงานที่ปฏิบัติงานจริง *</label>
-          <input id="unit_actual" placeholder="เช่น ร้อย ค. กองพัน ทพ.4301">
+          <input id="unit_actual" placeholder="เช่น ฝกบ.กรม ทพ.11">
           <div class="err" id="e_unit_actual">กรุณากรอกหน่วยงานจริง</div>
         </div>
       </div>
@@ -207,34 +226,34 @@
           <div class="err" id="e_province">กรุณาเลือกจังหวัด</div>
         </div>
         <div class="field">
-          <label>ระบุสังกัดเพิ่มเติม (กรณีไม่มีในตัวเลือก)</label>
-          <input id="unit_extra" placeholder="ระบุสังกัดของท่าน">
+          <label>หน่วยงานที่ปฏิบัติงาน (เต็ม)</label>
+          <input id="unit_extra" placeholder="เช่น หน่วยเฉพาะกิจกรมทหารพรานที่ 11">
         </div>
       </div>
       <div class="sec-label">ตำแหน่งและที่อยู่หน่วย</div>
       <div class="grid g1">
         <div class="field">
           <label>ตำแหน่งตามคำสั่งกองทัพบก *</label>
-          <input id="position_order" placeholder="เช่น ผู้บังคับหมวดปืนเล็ก">
+          <input id="position_order" placeholder="เช่น ผบ.ชุดปฏิบัติการ กรม ทพ.11">
           <div class="err" id="e_position_order">กรุณากรอกตำแหน่ง</div>
         </div>
       </div>
       <div class="grid g1">
         <div class="field">
           <label>ปัจจุบันปฏิบัติหน้าที่ *</label>
-          <input id="position_actual" placeholder="เช่น ผู้บังคับหมู่ / ช่วยราชการ">
+          <input id="position_actual" placeholder="เช่น ฝกบ.กรม ทพ.11">
           <div class="err" id="e_position_actual">กรุณากรอกหน้าที่ปัจจุบัน</div>
         </div>
       </div>
       <div class="grid g2">
         <div class="field">
           <label>ที่อยู่หน่วย *</label>
-          <input id="unit_addr" placeholder="ที่อยู่หน่วยงาน">
+          <input id="unit_addr" placeholder="ที่อยู่หน่วยงาน รหัสไปรษณีย์">
           <div class="err" id="e_unit_addr">กรุณากรอกที่อยู่หน่วย</div>
         </div>
         <div class="field">
           <label>โทรศัพท์ (ทบ.)</label>
-          <input id="tel_army" placeholder="เช่น 2-xxxx">
+          <input id="tel_army" placeholder="เช่น 073584114">
         </div>
       </div>
       <div class="row">
@@ -243,20 +262,20 @@
       </div>
     </div>
 
-    <!-- STEP 3 -->
+    <!-- STEP 3 ติดต่อ/ศึกษา -->
     <div class="step" id="s2">
-      <div class="step-title">ที่อยู่ส่วนตัว / การศึกษา / การติดต่อ</div>
+      <div class="step-title">📞 ที่อยู่ / การติดต่อ / การศึกษา</div>
       <div class="sec-label">ที่อยู่และการติดต่อ</div>
       <div class="grid g1">
         <div class="field">
           <label>ที่อยู่ปัจจุบัน *</label>
-          <textarea id="home_addr" placeholder="บ้านเลขที่ ถนน แขวง/ตำบล เขต/อำเภอ จังหวัด รหัสไปรษณีย์"></textarea>
+          <textarea id="home_addr" placeholder="บ้านเลขที่ หมู่ ตำบล อำเภอ จังหวัด รหัสไปรษณีย์"></textarea>
           <div class="err" id="e_home_addr">กรุณากรอกที่อยู่</div>
         </div>
       </div>
       <div class="grid g3">
         <div class="field">
-          <label>เบอร์โทรศัพท์ส่วนตัว *</label>
+          <label>เบอร์โทรศัพท์มือถือ *</label>
           <input id="phone" placeholder="08x-xxx-xxxx">
           <div class="err" id="e_phone">กรุณากรอกเบอร์โทร</div>
         </div>
@@ -272,7 +291,7 @@
       <div class="grid g1">
         <div class="field">
           <label>บุคคลติดต่อกรณีฉุกเฉิน (ชื่อ-สกุล / เบอร์โทร) *</label>
-          <input id="emergency" placeholder="เช่น นางสมศรี ใจดี / 081-234-5678">
+          <input id="emergency" placeholder="เช่น นางสาว สมศรี ใจดี / 081-234-5678">
           <div class="err" id="e_emergency">กรุณากรอกข้อมูลผู้ติดต่อฉุกเฉิน</div>
         </div>
       </div>
@@ -281,18 +300,18 @@
         <div class="field">
           <label>คุณวุฒิสูงสุด *</label>
           <select id="edu">
-            <option value="">-- เลือก --</option><option>ม.3</option><option>ม.6</option><option>ปวช.</option><option>ปวส.</option><option>ปริญญาตรี</option><option>ปริญญาโท</option><option>ปริญญาเอก</option>
+            <option value="">-- เลือก --</option><option>ต่ำกว่าปริญญา</option><option>ม.3</option><option>ม.6</option><option>ปวช.</option><option>ปวส. / กศน.</option><option>ปริญญาตรี</option><option>ปริญญาโท</option><option>ปริญญาเอก</option>
           </select>
           <div class="err" id="e_edu">กรุณาเลือกคุณวุฒิ</div>
         </div>
         <div class="field">
-          <label>สถาบันการศึกษา *</label>
-          <input id="edu_school" placeholder="ชื่อสถาบัน">
+          <label>สถาบันการศึกษา / หลักสูตร *</label>
+          <input id="edu_school" placeholder="ชื่อสถาบัน / หลักสูตร">
           <div class="err" id="e_edu_school">กรุณากรอกสถาบัน</div>
         </div>
         <div class="field">
-          <label>ปีการศึกษาที่จบ *</label>
-          <input id="edu_year" type="number" min="2500" max="2580" placeholder="พ.ศ.">
+          <label>ปีการศึกษาที่จบ (พ.ศ.) *</label>
+          <input id="edu_year" type="number" min="2500" max="2580" placeholder="เช่น 2566">
           <div class="err" id="e_edu_year">กรุณากรอกปีที่จบ</div>
         </div>
       </div>
@@ -315,7 +334,9 @@
         <div class="field">
           <label>ระดับความเร่งด่วน *</label>
           <select id="urgency">
-            <option value="">-- เลือก --</option><option>ด่วนที่สุด</option><option>ด่วนมาก</option><option>ด่วน</option><option>ปกติ</option>
+            <option value="">-- เลือก --</option>
+            <option>เร่งด่วน 1 ปฏิบัติหน้าที่ในสายงานส่งกำลังบำรุง</option>
+            <option>เร่งด่วน 2</option><option>เร่งด่วน 3</option><option>ปกติ</option>
           </select>
           <div class="err" id="e_urgency">กรุณาเลือก</div>
         </div>
@@ -328,7 +349,7 @@
 
     <!-- STEP 4 สรุป -->
     <div class="step" id="s3">
-      <div class="step-title">ตรวจสอบและยืนยันข้อมูล</div>
+      <div class="step-title">✅ ตรวจสอบและยืนยันข้อมูล</div>
       <div class="edit-note">📋 ตรวจสอบข้อมูลให้ครบถ้วน — หากต้องการแก้ไขกด "แก้ไขข้อมูล" ได้เลย</div>
       <div id="toast-ok" class="toast ok">✅ ส่งข้อมูลเข้า Google Sheets สำเร็จแล้ว!</div>
       <div id="toast-er" class="toast er">❌ เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง</div>
@@ -340,13 +361,11 @@
       </div>
     </div>
 
-  </div><!-- /body -->
-</div><!-- /container -->
+  </div>
+</div>
 
 <script>
-// ===== CONFIG =====
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycby6vd40DJ6_dmBraXnVLehX5KVroKaDU-mQYE-aQbRf7-2w3zpZ7GDHrYyeWbfMq8nWSg/exec';
-// ==================
 
 const $ = id => document.getElementById(id);
 const g = id => {
@@ -393,7 +412,10 @@ function go(n) {
   const cur = steps.findIndex(s => s.classList.contains('active'));
   if (n > cur && !validate(cur)) return;
   steps.forEach((s,i) => s.classList.toggle('active', i===n));
-  psteps.forEach((p,i) => p.classList.toggle('done', i<=n));
+  psteps.forEach((p,i) => {
+    p.classList.toggle('done', i < n);
+    p.classList.toggle('active', i === n);
+  });
   if (n === 3) buildSum();
   window.scrollTo({top:0, behavior:'smooth'});
 }
@@ -409,10 +431,10 @@ function buildSum() {
       ['รุ่น',g('generation')||'-'],['เหล่า',g('corps')||'-'],
     ]},
     {t:'ข้อมูลหน่วยและตำแหน่ง', rows:[
-      ['สังกัด (กรม/กองพัน)',g('unit_main')],
+      ['สังกัด',g('unit_main')],
       ['หน่วยงานปฏิบัติงานจริง',g('unit_actual')],
-      ['จังหวัดที่ตั้งหน่วย',g('province')],
-      ['สังกัดเพิ่มเติม',g('unit_extra')||'-'],
+      ['จังหวัด',g('province')],
+      ['หน่วยงานที่ปฏิบัติงาน (เต็ม)',g('unit_extra')||'-'],
       ['ตำแหน่งตามคำสั่ง ทบ.',g('position_order')],
       ['ปัจจุบันปฏิบัติหน้าที่',g('position_actual')],
       ['ที่อยู่หน่วย',g('unit_addr')],
@@ -420,18 +442,18 @@ function buildSum() {
     ]},
     {t:'ที่อยู่และการติดต่อ', rows:[
       ['ที่อยู่ปัจจุบัน',g('home_addr')],
-      ['เบอร์โทรศัพท์ส่วนตัว',g('phone')],
+      ['เบอร์โทรศัพท์มือถือ',g('phone')],
       ['E-Mail',g('email')||'-'],['Line ID',g('line_id')||'-'],
       ['ติดต่อกรณีฉุกเฉิน',g('emergency')],
     ]},
     {t:'การศึกษา', rows:[
       ['คุณวุฒิสูงสุด',g('edu')],
-      ['สถาบันการศึกษา',g('edu_school')],
-      ['ปีการศึกษาที่จบ',g('edu_year')],
+      ['สถาบัน/หลักสูตร',g('edu_school')],
+      ['ปีที่จบ',g('edu_year')],
     ]},
     {t:'ความต้องการขณะฝึกอบรม', rows:[
-      ['ห้องพักขณะอบรม',g('room')],
-      ['การรับค่าเบี้ยเลี้ยง',g('allowance')],
+      ['ห้องพัก',g('room')],
+      ['ค่าเบี้ยเลี้ยง',g('allowance')],
       ['ระดับความเร่งด่วน',g('urgency')],
     ]},
   ];
@@ -464,10 +486,8 @@ function submitData() {
   btn.innerHTML = '<span class="spin"></span>กำลังส่ง...';
   $('toast-ok').classList.remove('show');
   $('toast-er').classList.remove('show');
-
   fetch(SHEET_URL, {
-    method: 'POST',
-    mode: 'no-cors',
+    method: 'POST', mode: 'no-cors',
     headers: {'Content-Type':'application/json'},
     body: JSON.stringify(getData())
   }).then(() => {
@@ -484,79 +504,119 @@ function submitData() {
 }
 
 function dlPDF() {
-  const secs = [
-    {t:'1. ข้อมูลส่วนตัว', rows:[
-      ['ยศ',g('rank')],['ชื่อ-นามสกุล (ภาษาไทย)',g('name_th')],
-      ['Rank Name-Surname (EN)',g('name_en')],['วัน/เดือน/ปี เกิด',g('dob')],
-      ['เพศ',g('gender')],['กรุ๊ปเลือด',g('blood')||'-'],
-      ['อายุ',g('age')||'-'],['ศาสนา',g('religion')||'-'],
-      ['สถานภาพ',g('status')||'-'],['กำเนิด',g('origin')],
-      ['รุ่น',g('generation')||'-'],['เหล่า',g('corps')||'-'],
-    ]},
-    {t:'2. ข้อมูลหน่วยและตำแหน่ง', rows:[
-      ['สังกัด (กรม/กองพัน)',g('unit_main')],
-      ['หน่วยงานปฏิบัติงานจริง',g('unit_actual')],
-      ['จังหวัดที่ตั้งหน่วย',g('province')],
-      ['สังกัดเพิ่มเติม',g('unit_extra')||'-'],
-      ['ตำแหน่งตามคำสั่ง ทบ.',g('position_order')],
-      ['ปัจจุบันปฏิบัติหน้าที่',g('position_actual')],
-      ['ที่อยู่หน่วย',g('unit_addr')],
-      ['โทรศัพท์ (ทบ.)',g('tel_army')||'-'],
-    ]},
-    {t:'3. ที่อยู่และการติดต่อ', rows:[
-      ['ที่อยู่ปัจจุบัน',g('home_addr')],
-      ['เบอร์โทรศัพท์ส่วนตัว',g('phone')],
-      ['E-Mail',g('email')||'-'],['Line ID',g('line_id')||'-'],
-      ['ติดต่อกรณีฉุกเฉิน',g('emergency')],
-    ]},
-    {t:'4. การศึกษา', rows:[
-      ['คุณวุฒิสูงสุด',g('edu')],
-      ['สถาบันการศึกษา',g('edu_school')],
-      ['ปีการศึกษาที่จบ',g('edu_year')],
-    ]},
-    {t:'5. ความต้องการขณะฝึกอบรม', rows:[
-      ['ห้องพักขณะอบรม',g('room')],
-      ['การรับค่าเบี้ยเลี้ยง',g('allowance')],
-      ['ระดับความเร่งด่วน',g('urgency')],
-    ]},
+  const name = g('rank') + ' ' + g('name_th');
+  const today = new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
+
+  // Format DOB to Thai
+  let dobStr = g('dob');
+  if (dobStr) {
+    const d = new Date(dobStr);
+    dobStr = d.toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
+  }
+
+  // Army badge SVG for PDF
+  const badgeSVG = `<svg width="110" height="110" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="50" cy="50" r="46" fill="#1a3a6b" stroke="#c8a84b" stroke-width="3"/>
+    <circle cx="50" cy="50" r="38" fill="none" stroke="#c8a84b" stroke-width="1.5"/>
+    <circle cx="50" cy="50" r="32" fill="none" stroke="rgba(200,168,75,0.4)" stroke-width="1"/>
+    <ellipse cx="50" cy="20" rx="7" ry="12" fill="#FFD700"/>
+    <ellipse cx="50" cy="24" rx="4" ry="7" fill="#FF8C00"/>
+    <rect x="47" y="30" width="6" height="16" rx="2" fill="#d4af37"/>
+    <polygon points="50,46 52.5,53 60,53 54,57.5 56.5,64 50,60 43.5,64 46,57.5 40,53 47.5,53" fill="#FFD700"/>
+    <text x="50" y="85" text-anchor="middle" font-size="6.5" fill="#c8a84b" font-family="serif" font-weight="bold" letter-spacing="0.5">ส่งกำลังบำรุง</text>
+    <text x="50" y="93" text-anchor="middle" font-size="5.5" fill="#c8a84b" font-family="serif">กองทัพบก</text>
+  </svg>`;
+
+  const rows1 = [
+    ['ยศ - ชื่อ - สกุล', name],
+    ['วัน/เดือน/ปี เกิด', dobStr + (g('age') ? ` &nbsp;&nbsp; อายุ : ${g('age')} ปี` : '')],
+    ['กรุ๊ปเลือด', g('blood')||'-'],
+    ['เพศ', g('gender')],
+    ['ศาสนา', g('religion')||'-'],
+    ['สถานภาพ', g('status')||'-'],
+    ['กำเนิด', g('origin')||'-'],
+    ['รุ่น', g('generation')||'-'],
+    ['เหล่า', g('corps')||'-'],
+    ['สังกัด', g('unit_main')],
+    ['ตำแหน่งตามคำสั่ง ทบ.', g('position_order')],
+    ['ปัจจุบันปฏิบัติหน้าที่', g('position_actual')],
+    ['หน่วยงานที่ปฏิบัติงาน', g('unit_extra') || g('unit_actual')],
+    ['ที่อยู่หน่วย', g('unit_addr')],
+    ['ที่อยู่ปัจจุบัน', g('home_addr')],
+    ['เบอร์โทรศัพท์มือถือ', g('phone') + (g('tel_army') ? ` &nbsp;&nbsp; โทร ทบ. : ${g('tel_army')}` : '')],
+    ['ตำแหน่งตามคำสั่ง ทบ.', g('position_order')],
+    ['E-mail', g('email')||'-'],
+    ['Line ID', g('line_id')||'-'],
+    ['การศึกษาสูงสุด', g('edu') + (g('edu_school') ? ' / ' + g('edu_school') : '') + (g('edu_year') ? ' / ' + g('edu_year') : '')],
+    ['บุคคลที่ติดต่อได้ในกรณีฉุกเฉิน', g('emergency')],
+    ['ความเร่งด่วน', g('urgency')],
   ];
 
-  const today = new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
-  const name = g('rank') + ' ' + g('name_th');
+  const tableRows = rows1.map(([l, v]) => `
+    <tr>
+      <td class="lbl">${l}</td>
+      <td class="val">${v || '-'}</td>
+    </tr>`).join('');
 
-  const rows = secs.map(sec => `
-    <tr><td colspan="2" class="sec-head">${sec.t}</td></tr>
-    ${sec.rows.map(([l,v]) => `<tr><td class="lbl">${l}</td><td class="val">${v||'-'}</td></tr>`).join('')}
-  `).join('');
-
-  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+  const html = `<!DOCTYPE html><html><head>
+  <meta charset="UTF-8">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600&display=swap');
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:'Sarabun',sans-serif; font-size:13px; color:#1a1a2e; padding:20px; }
-    .header { text-align:center; border-bottom:2px solid #1a3a6b; padding-bottom:12px; margin-bottom:16px; }
-    .header h1 { font-size:16px; color:#1a3a6b; font-weight:600; margin-bottom:4px; }
-    .header p { font-size:11px; color:#666; }
-    table { width:100%; border-collapse:collapse; }
-    .sec-head { background:#1a3a6b; color:#fff; font-weight:600; font-size:12px; padding:6px 10px; margin-top:10px; }
-    .lbl { width:42%; padding:5px 10px; color:#475569; background:#f8fafc; border-bottom:1px solid #e2e8f0; vertical-align:top; }
-    .val { padding:5px 10px; color:#1a1a2e; border-bottom:1px solid #e2e8f0; vertical-align:top; font-weight:500; }
-    .footer { margin-top:30px; display:flex; justify-content:space-between; }
-    .sig { text-align:center; }
-    .sig-line { border-top:1px solid #333; width:160px; margin:0 auto 4px; }
-    .sig p { font-size:11px; color:#666; }
-    @media print { body { padding:10px; } }
-  </style></head><body>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Sarabun',sans-serif;font-size:13.5px;color:#111;background:#fff;padding:28px 32px}
+    .header{text-align:center;margin-bottom:18px;padding-bottom:14px;border-bottom:2.5px solid #1a3a6b}
+    .header h1{font-size:17px;color:#0d2b5e;font-weight:700;margin-bottom:2px}
+    .header h2{font-size:15px;color:#0d2b5e;font-weight:700;margin-bottom:6px}
+    .header p{font-size:11px;color:#666}
+    .top-section{display:flex;gap:20px;align-items:flex-start;margin-bottom:16px}
+    .badge-area{flex-shrink:0;text-align:center}
+    .photo-box{width:90px;height:110px;border:1.5px solid #888;display:flex;align-items:center;justify-content:center;font-size:10px;color:#888;margin-bottom:4px;background:#f9f9f9}
+    .photo-label{font-size:9px;color:#666;text-align:center}
+    .info-table{width:100%;border-collapse:collapse;flex:1}
+    .info-table td{padding:5px 10px;border-bottom:1px solid #e8e8e8;vertical-align:top;line-height:1.5}
+    .lbl{width:42%;color:#374151;background:#f7f9fc;font-weight:600;font-size:12.5px}
+    .val{color:#111;font-weight:500;font-size:13px}
+    .footer{margin-top:36px;display:flex;justify-content:space-between;align-items:flex-end;padding-top:14px;border-top:1px solid #ddd}
+    .sig-block{text-align:center}
+    .sig-line{border-top:1.5px solid #333;width:180px;margin:0 auto 5px}
+    .sig-text{font-size:11px;color:#555}
+    .urgency-box{background:#f0f6ff;border:1.5px solid #1a3a6b;border-radius:6px;padding:7px 14px;font-size:12px;color:#0d2b5e;font-weight:600;margin-top:12px;display:inline-block}
+    @media print{body{padding:14px 18px}@page{margin:1cm}}
+  </style>
+  </head><body>
   <div class="header">
-    <h1>แบบฟอร์มสมัครเข้ารับการฝึกอบรม</h1>
-    <p>วันที่: ${today}</p>
+    <h1>ใบสมัครเข้ารับการฝึกอบรม</h1>
+    <h2>หลักสูตรนายสิบส่งกำลังบำรุง รุ่นที่ 6 ปีงบประมาณ 2569</h2>
+    <p>วันที่พิมพ์ : ${today}</p>
   </div>
-  <table>${rows}</table>
+
+  <div class="top-section">
+    <div class="badge-area">
+      <div style="margin-bottom:10px">${badgeSVG}</div>
+      <div class="photo-box">รูปขนาด<br>1 นิ้ว</div>
+      <div class="photo-label">รูปถ่ายผู้สมัคร</div>
+    </div>
+    <table class="info-table">
+      ${tableRows}
+    </table>
+  </div>
+
+  <div class="urgency-box">ความเร่งด่วน : ${g('urgency')||'-'}</div>
+
   <div class="footer">
-    <div class="sig"><div class="sig-line"></div><p>ลายมือชื่อผู้สมัคร</p><p>(${name})</p></div>
-    <div class="sig"><div class="sig-line"></div><p>วันที่</p></div>
+    <div class="sig-block">
+      <div class="sig-line"></div>
+      <div class="sig-text">ลงชื่อ……………………………………………</div>
+      <div class="sig-text">(${name})</div>
+      <div class="sig-text">(ตำแหน่ง) ${g('position_order')||'...................................'}</div>
+    </div>
+    <div class="sig-block">
+      <div class="sig-line"></div>
+      <div class="sig-text">วันที่ ............................................</div>
+    </div>
   </div>
-  <script>window.onload=()=>{window.print();}<\/script>
+
+  <script>window.onload=()=>{setTimeout(()=>window.print(),300);}<\/script>
   </body></html>`;
 
   const w = window.open('','_blank');
