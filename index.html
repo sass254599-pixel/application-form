@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>แบบฟอร์มสมัครเข้ารับการฝึกอบรม</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
+<style>
+  .flatpickr-calendar{font-family:'Sarabun',sans-serif!important}
+  .flatpickr-day.selected{background:#1a5c96!important;border-color:#1a5c96!important}
+  .flatpickr-day:hover{background:#dde9f5!important}
+</style>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
@@ -119,7 +126,7 @@
         </div>
         <div class="field">
           <label>วัน/เดือน/ปี (พ.ศ.) เกิด *</label>
-          <input id="dob" type="text" placeholder="dd/mm/พ.ศ." maxlength="10" oninput="fmtDOB(this)" onblur="calcAge(this.value)">
+          <input id="dob" type="text" placeholder="dd/mm/พ.ศ." maxlength="10" autocomplete="off">
           <div class="err" id="e_dob">กรุณาระบุวันเกิด</div>
         </div>
       </div>
@@ -200,12 +207,12 @@
           <div class="err" id="e_unit_main">กรุณากรอกสังกัด</div>
         </div>
         <div class="field">
-          <label>หน่วยงานที่ปฏิบัติงานจริง *</label>
+          <label>หน่วยงานที่ปฏิบัติงาน *</label>
           <input id="unit_actual" placeholder="เช่น ฝกบ.กรม ทพ.11">
-          <div class="err" id="e_unit_actual">กรุณากรอกหน่วยงานจริง</div>
+          <div class="err" id="e_unit_actual">กรุณากรอกหน่วยงานที่ปฏิบัติงาน</div>
         </div>
       </div>
-      <div class="grid g2">
+      <div class="grid g1">
         <div class="field">
           <label>จังหวัดที่ตั้งหน่วย *</label>
           <select id="province">
@@ -213,10 +220,6 @@
             <option>กรุงเทพมหานคร</option><option>กระบี่</option><option>กาญจนบุรี</option><option>กาฬสินธุ์</option><option>กำแพงเพชร</option><option>ขอนแก่น</option><option>จันทบุรี</option><option>ฉะเชิงเทรา</option><option>ชลบุรี</option><option>ชัยนาท</option><option>ชัยภูมิ</option><option>ชุมพร</option><option>เชียงราย</option><option>เชียงใหม่</option><option>ตรัง</option><option>ตราด</option><option>ตาก</option><option>นครนายก</option><option>นครปฐม</option><option>นครพนม</option><option>นครราชสีมา</option><option>นครศรีธรรมราช</option><option>นครสวรรค์</option><option>นนทบุรี</option><option>นราธิวาส</option><option>น่าน</option><option>บึงกาฬ</option><option>บุรีรัมย์</option><option>ปทุมธานี</option><option>ประจวบคีรีขันธ์</option><option>ปราจีนบุรี</option><option>ปัตตานี</option><option>พระนครศรีอยุธยา</option><option>พะเยา</option><option>พังงา</option><option>พัทลุง</option><option>พิจิตร</option><option>พิษณุโลก</option><option>เพชรบุรี</option><option>เพชรบูรณ์</option><option>แพร่</option><option>ภูเก็ต</option><option>มหาสารคาม</option><option>มุกดาหาร</option><option>แม่ฮ่องสอน</option><option>ยโสธร</option><option>ยะลา</option><option>ร้อยเอ็ด</option><option>ระนอง</option><option>ระยอง</option><option>ราชบุรี</option><option>ลพบุรี</option><option>ลำปาง</option><option>ลำพูน</option><option>เลย</option><option>ศรีสะเกษ</option><option>สกลนคร</option><option>สงขลา</option><option>สตูล</option><option>สมุทรปราการ</option><option>สมุทรสงคราม</option><option>สมุทรสาคร</option><option>สระแก้ว</option><option>สระบุรี</option><option>สิงห์บุรี</option><option>สุโขทัย</option><option>สุพรรณบุรี</option><option>สุราษฎร์ธานี</option><option>สุรินทร์</option><option>หนองคาย</option><option>หนองบัวลำภู</option><option>อ่างทอง</option><option>อำนาจเจริญ</option><option>อุดรธานี</option><option>อุตรดิตถ์</option><option>อุทัยธานี</option><option>อุบลราชธานี</option>
           </select>
           <div class="err" id="e_province">กรุณาเลือกจังหวัด</div>
-        </div>
-        <div class="field">
-          <label>หน่วยงานที่ปฏิบัติงาน (ชื่อเต็ม)</label>
-          <input id="unit_extra" placeholder="เช่น หน่วยเฉพาะกิจกรมทหารพรานที่ 11">
         </div>
       </div>
       <div class="sec-label">ตำแหน่งและที่อยู่หน่วย</div>
@@ -410,8 +413,7 @@ function buildSum() {
     ]},
     {t:'ข้อมูลหน่วยและตำแหน่ง', rows:[
       ['สังกัด',g('unit_main')],['หน่วยงานปฏิบัติงานจริง',g('unit_actual')],
-      ['จังหวัด',g('province')],['หน่วยงานที่ปฏิบัติงาน (เต็ม)',g('unit_extra')||'-'],
-      ['ตำแหน่งตามคำสั่ง ทบ.',g('position_order')],['ปัจจุบันปฏิบัติหน้าที่',g('position_actual')],
+      ['จังหวัด',g('province')],['ตำแหน่งตามคำสั่ง ทบ.',g('position_order')],['ปัจจุบันปฏิบัติหน้าที่',g('position_actual')],
       ['ที่อยู่หน่วย',g('unit_addr')],['โทรศัพท์ (ทบ.)',g('tel_army')||'-'],
     ]},
     {t:'ที่อยู่และการติดต่อ', rows:[
@@ -438,7 +440,7 @@ function getData() {
     blood:g('blood'),age:g('age'),religion:g('religion'),status:g('status'),
     origin:g('origin'),generation:g('generation'),corps:g('corps'),
     unit_main:g('unit_main'),unit_actual:g('unit_actual'),province:g('province'),
-    unit_extra:g('unit_extra'),position_order:g('position_order'),
+    position_order:g('position_order'),
     position_actual:g('position_actual'),unit_addr:g('unit_addr'),tel_army:g('tel_army'),
     home_addr:g('home_addr'),phone:g('phone'),email:g('email'),line_id:g('line_id'),
     emergency:g('emergency'),edu:g('edu'),edu_school:g('edu_school'),edu_year:g('edu_year'),
@@ -499,25 +501,27 @@ function dlPDF() {
   }
 
   const allRows = [
-    ['ยศ - ชื่อ - สกุล',         name],
-    ['วัน/เดือน/ปี (พ.ศ.) เกิด', dobStr || '-'],
-    ['อายุ',                     (g('age')||'-') + ' ปี'],
-    ['เพศ',                      g('gender') || '-'],
-    ['สถานภาพ',                  g('status') || '-'],
-    ['กรุ๊ปเลือด',               g('blood') || '-'],
-    ['ศาสนา',                    g('religion') || '-'],
-    ['กำเนิด',                   g('origin') || '-'],
-    ['รุ่น',                     g('generation') || '-'],
-    ['เหล่า',                    g('corps') || '-'],
-    ['ตำแหน่งตามคำสั่ง ทบ.',     g('position_order') || '-'],
-    ['ปัจจุบันปฏิบัติงาน',       g('position_actual') || '-'],
-    ['ที่อยู่หน่วย',             g('unit_addr') || '-'],
-    ['เบอร์โทรศัพท์มือถือ',     g('phone') || '-'],
-    ['โทร ทบ.',                  g('tel_army') || '-'],
-    ['E-mail',                   g('email') || '-'],
-    ['การศึกษาสูงสุด',           g('edu') + (g('edu_school') ? ' / ' + g('edu_school') : '') + (g('edu_year') ? ' / ' + g('edu_year') : '')],
-    ['บุคคลที่ติดต่อได้',        g('emergency') || '-'],
-    ['ความเร่งด่วน',             g('urgency') || '-'],
+    ['ยศ - ชื่อ - สกุล',              name],
+    ['วัน/เดือน/ปี (พ.ศ.) เกิด',      dobStr || '-'],
+    ['อายุ',                          (g('age')||'-') + ' ปี'],
+    ['เพศ',                           g('gender') || '-'],
+    ['สถานภาพ',                       g('status') || '-'],
+    ['กรุ๊ปเลือด',                    g('blood') || '-'],
+    ['ศาสนา',                         g('religion') || '-'],
+    ['กำเนิด',                        g('origin') || '-'],
+    ['รุ่น',                          g('generation') || '-'],
+    ['เหล่า',                         g('corps') || '-'],
+    ['สังกัด',                        g('unit_main') || '-'],
+    ['ตำแหน่งตามคำสั่ง ทบ.',          g('position_order') || '-'],
+    ['ปัจจุบันปฏิบัติหน้าที่',        g('position_actual') || '-'],
+    ['ที่อยู่ปัจจุบัน',               g('home_addr') || '-'],
+    ['ที่อยู่หน่วย',                  g('unit_addr') || '-'],
+    ['เบอร์โทรศัพท์มือถือ',          g('phone') || '-'],
+    ['โทร ทบ.',                       g('tel_army') || '-'],
+    ['E-mail',                        g('email') || '-'],
+    ['การศึกษาสูงสุด',                g('edu') + (g('edu_school') ? ' / ' + g('edu_school') : '') + (g('edu_year') ? ' / ' + g('edu_year') : '')],
+    ['บุคคลติดต่อกรณีฉุกเฉิน',       g('emergency') || '-'],
+    ['ความเร่งด่วน',                  g('urgency') || '-'],
   ];
 
   const rowsHtml = allRows
@@ -525,7 +529,14 @@ function dlPDF() {
     .join('');
 
   const printDoc = '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
-    '<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">' +
+    '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
+<style>
+  .flatpickr-calendar{font-family:'Sarabun',sans-serif!important}
+  .flatpickr-day.selected{background:#1a5c96!important;border-color:#1a5c96!important}
+  .flatpickr-day:hover{background:#dde9f5!important}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">' +
     '<style>' +
       '*{margin:0;padding:0;box-sizing:border-box}' +
       'body{font-family:Sarabun,sans-serif;font-size:12.5px;color:#111;padding:22px 28px;position:relative}' +
@@ -585,6 +596,48 @@ function dlPDF() {
   w.document.write(printDoc);
   w.document.close();
 }
+
+// Init flatpickr for dob - Thai Buddhist Era display
+document.addEventListener('DOMContentLoaded', function() {
+  flatpickr('#dob', {
+    dateFormat: 'd/m/Y',       // ค.ศ. internally
+    allowInput: true,
+    locale: {
+      firstDayOfWeek: 1,
+      weekdays: { shorthand:['อา','จ','อ','พ','พฤ','ศ','ส'], longhand:['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัส','ศุกร์','เสาร์'] },
+      months: {
+        shorthand:['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'],
+        longhand:['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม']
+      }
+    },
+    onReady: function(sel, dateStr, fp) {
+      // Override year display to พ.ศ.
+      fp.calendarContainer.addEventListener('DOMSubtreeModified', function() {
+        const yr = fp.calendarContainer.querySelector('.cur-year');
+        if (yr && parseInt(yr.value) < 2500) yr.value = parseInt(yr.value) + 543;
+      });
+    },
+    onValueUpdate: function(sel, dateStr, fp) {
+      if (fp.selectedDates[0]) {
+        const d = fp.selectedDates[0];
+        const dd = String(d.getDate()).padStart(2,'0');
+        const mm = String(d.getMonth()+1).padStart(2,'0');
+        const yyyy = d.getFullYear() + 543; // แปลงเป็น พ.ศ.
+        fp.input.value = dd + '/' + mm + '/' + yyyy;
+        calcAge(fp.input.value);
+      }
+    },
+    parseDate: function(dateStr) {
+      if (!dateStr) return null;
+      const parts = dateStr.split('/');
+      if (parts.length === 3) {
+        const yr = parseInt(parts[2]) > 2400 ? parseInt(parts[2]) - 543 : parseInt(parts[2]);
+        return new Date(yr, parseInt(parts[1])-1, parseInt(parts[0]));
+      }
+      return null;
+    }
+  });
+});
 </script>
 </body>
 </html>
