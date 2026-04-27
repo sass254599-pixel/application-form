@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>แบบฟอร์มสมัครเข้ารับการฝึกอบรม</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Sarabun',sans-serif;background:#f4f6f9;color:#1a1a2e;font-size:14px;padding:20px}
+  .container{max-width:720px;margin:0 auto;background:#fff;border-radius:12px;box-shadow:0 2px 16px rgba(0,0,0,.1);overflow:hidden}
+  .header{background:linear-gradient(135deg,#1a3a6b,#1a5c96);color:#fff;padding:24px 28px}
+  .header h1{font-size:18px;font-weight:600;margin-bottom:4px}
+  .header p{font-size:12px;opacity:.8}
+  .body{padding:24px 28px}
+  .prog-wrap{display:flex;align-items:center;gap:0;margin-bottom:24px}
+  .prog-step{flex:1;text-align:center;position:relative}
+  .prog-step:not(:last-child)::after{content:'';position:absolute;top:13px;left:50%;width:100%;height:2px;background:#e2e8f0;z-index:0}
+  .prog-step.done:not(:last-child)::after{background:#1a5c96}
+  .prog-dot{width:26px;height:26px;border-radius:50%;background:#e2e8f0;color:#94a3b8;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;margin:0 auto 4px;position:relative;z-index:1;transition:all .3s}
+  .prog-step.done .prog-dot{background:#1a5c96;color:#fff}
+  .prog-label{font-size:10px;color:#94a3b8}
+  .prog-step.done .prog-label{color:#1a5c96;font-weight:500}
+  .step{display:none}.step.active{display:block}
+  .step-title{font-size:16px;font-weight:600;color:#1a3a6b;margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid #e8f0f8}
+  .sec-label{font-size:11px;font-weight:600;color:#64748b;letter-spacing:.07em;text-transform:uppercase;margin:16px 0 8px;padding-bottom:5px;border-bottom:1px solid #f1f5f9}
+  .grid{display:grid;gap:12px;margin-bottom:4px}
+  .g1{grid-template-columns:1fr}
+  .g2{grid-template-columns:1fr 1fr}
+  .g3{grid-template-columns:1fr 1fr 1fr}
+  .field{display:flex;flex-direction:column;gap:4px}
+  .field label{font-size:12px;color:#475569;font-weight:500}
+  .field input,.field select,.field textarea{
+    width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;
+    background:#fafafa;color:#1a1a2e;font-size:13px;font-family:'Sarabun',sans-serif;
+    transition:border-color .2s,box-shadow .2s
+  }
+  .field textarea{resize:vertical;min-height:64px}
+  .field input:focus,.field select:focus,.field textarea:focus{
+    outline:none;border-color:#1a5c96;background:#fff;box-shadow:0 0 0 3px rgba(26,92,150,.1)
+  }
+  .other-input{margin-top:6px;display:none}
+  .other-input.show{display:block}
+  .err{font-size:11px;color:#dc2626;display:none;margin-top:2px}
+  .row{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid #f1f5f9}
+  .btn{padding:8px 20px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;color:#475569;font-size:13px;cursor:pointer;font-family:'Sarabun',sans-serif;font-weight:500;transition:all .2s}
+  .btn:hover{background:#f8fafc}
+  .btn.pri{background:#1a5c96;color:#fff;border-color:#1a5c96}
+  .btn.pri:hover{background:#154d80}
+  .btn.grn{background:#15803d;color:#fff;border-color:#15803d}
+  .btn.grn:hover{background:#166534}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .sum-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px;margin-bottom:12px}
+  .sum-card h3{font-size:11px;font-weight:600;color:#1a5c96;margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em}
+  .sum-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid #f1f5f9;font-size:12px;gap:8px}
+  .sum-row:last-child{border-bottom:none}
+  .sum-row .lb{color:#64748b;white-space:nowrap;flex-shrink:0}
+  .sum-row .vl{font-weight:500;text-align:right;word-break:break-word}
+  .toast{border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;display:none;font-weight:500}
+  .toast.ok{background:#dcfce7;color:#166534;border:1px solid #bbf7d0}
+  .toast.er{background:#fee2e2;color:#991b1b;border:1px solid #fecaca}
+  .toast.show{display:block}
+  .edit-note{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;font-size:12px;color:#92400e;margin-bottom:14px}
+  .spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:5px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @media(max-width:560px){.g2,.g3{grid-template-columns:1fr}.body{padding:16px}}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>แบบฟอร์มสมัครเข้ารับการฝึกอบรม</h1>
+    <p>กรุณากรอกข้อมูลให้ครบถ้วนก่อนส่งใบสมัคร</p>
+  </div>
+  <div class="body">
+
+    <!-- Progress -->
+    <div class="prog-wrap">
+      <div class="prog-step done" id="ps0"><div class="prog-dot">1</div><div class="prog-label">ส่วนตัว</div></div>
+      <div class="prog-step" id="ps1"><div class="prog-dot">2</div><div class="prog-label">หน่วย</div></div>
+      <div class="prog-step" id="ps2"><div class="prog-dot">3</div><div class="prog-label">การศึกษา</div></div>
+      <div class="prog-step" id="ps3"><div class="prog-dot">4</div><div class="prog-label">ยืนยัน</div></div>
+    </div>
+
+    <!-- STEP 1 -->
+    <div class="step active" id="s0">
+      <div class="step-title">ข้อมูลส่วนตัว</div>
+      <div class="sec-label">ข้อมูลพื้นฐาน</div>
+      <div class="grid g2">
+        <div class="field">
+          <label>ยศ *</label>
+          <select id="rank" onchange="toggleOther('rank')">
+            <option value="">-- เลือก --</option>
+            <option>พลทหาร</option><option>พลฯ อาสา</option><option>สิบตรี</option><option>สิบโท</option><option>สิบเอก</option>
+            <option>จ่าสิบตรี</option><option>จ่าสิบโท</option><option>จ่าสิบเอก</option>
+            <option>ว่าที่ร้อยตรี</option><option>ร้อยตรี</option><option>ร้อยโท</option><option>ร้อยเอก</option>
+            <option>พันตรี</option><option>พันโท</option><option>พันเอก</option>
+            <option>พลตรี</option><option>พลโท</option><option>พลเอก</option>
+            <option value="other">อื่นๆ</option>
+          </select>
+          <input class="other-input" id="rank_other" placeholder="ระบุยศ">
+          <div class="err" id="e_rank">กรุณาเลือกยศ</div>
+        </div>
+        <div class="field">
+          <label>ชื่อ-นามสกุล (ภาษาไทย) *</label>
+          <input id="name_th" placeholder="เช่น สมชาย ใจดี">
+          <div class="err" id="e_name_th">กรุณากรอกชื่อ-นามสกุล</div>
+        </div>
+      </div>
+      <div class="grid g2">
+        <div class="field">
+          <label>Rank Name-Surname (English) *</label>
+          <input id="name_en" placeholder="e.g. CPT Somchai Jaidee">
+          <div class="err" id="e_name_en">Please fill in English name</div>
+        </div>
+        <div class="field">
+          <label>วัน/เดือน/ปี เกิด *</label>
+          <input id="dob" type="date">
+          <div class="err" id="e_dob">กรุณาระบุวันเกิด</div>
+        </div>
+      </div>
+      <div class="grid g3">
+        <div class="field">
+          <label>เพศ *</label>
+          <select id="gender">
+            <option value="">-- เลือก --</option><option>ชาย</option><option>หญิง</option>
+          </select>
+          <div class="err" id="e_gender">กรุณาเลือกเพศ</div>
+        </div>
+        <div class="field">
+          <label>กรุ๊ปเลือด</label>
+          <select id="blood">
+            <option value="">-- เลือก --</option><option>A</option><option>B</option><option>AB</option><option>O</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>อายุ (ปี)</label>
+          <input id="age" type="number" min="18" max="65" placeholder="เช่น 32">
+        </div>
+      </div>
+      <div class="grid g2">
+        <div class="field">
+          <label>ศาสนา</label>
+          <select id="religion" onchange="toggleOther('religion')">
+            <option value="">-- เลือก --</option><option>พุทธ</option><option>อิสลาม</option><option>คริสต์</option><option value="other">อื่นๆ</option>
+          </select>
+          <input class="other-input" id="religion_other" placeholder="ระบุศาสนา">
+        </div>
+        <div class="field">
+          <label>สถานภาพ</label>
+          <select id="status" onchange="toggleOther('status')">
+            <option value="">-- เลือก --</option><option>โสด</option><option>สมรส</option><option>หม้าย</option><option>หย่าร้าง</option><option value="other">อื่นๆ</option>
+          </select>
+          <input class="other-input" id="status_other" placeholder="ระบุสถานภาพ">
+        </div>
+      </div>
+      <div class="sec-label">กำเนิดและเหล่า</div>
+      <div class="grid g3">
+        <div class="field">
+          <label>กำเนิด *</label>
+          <select id="origin" onchange="toggleOther('origin')">
+            <option value="">-- เลือก --</option><option>นรข.</option><option>นนส.</option><option>พลอาสา</option><option>สัญญาบัตร</option><option value="other">อื่นๆ</option>
+          </select>
+          <input class="other-input" id="origin_other" placeholder="ระบุกำเนิด">
+          <div class="err" id="e_origin">กรุณาเลือกกำเนิด</div>
+        </div>
+        <div class="field">
+          <label>รุ่น</label>
+          <input id="generation" placeholder="เช่น รุ่น 51">
+        </div>
+        <div class="field">
+          <label>เหล่า</label>
+          <select id="corps" onchange="toggleOther('corps')">
+            <option value="">-- เลือก --</option><option>ราบ</option><option>ม้า</option><option>ปืนใหญ่</option><option>ช่าง</option><option>สื่อสาร</option><option>สรรพาวุธ</option><option>พลาธิการ</option><option>การเงิน</option><option>แพทย์</option><option>พยาบาล</option><option>สารวัตรทหาร</option><option value="other">อื่นๆ</option>
+          </select>
+          <input class="other-input" id="corps_other" placeholder="ระบุเหล่า">
+        </div>
+      </div>
+      <div class="row">
+        <button class="btn pri" onclick="go(1)">ถัดไป →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step" id="s1">
+      <div class="step-title">ข้อมูลหน่วยและตำแหน่ง</div>
+      <div class="sec-label">สังกัด</div>
+      <div class="grid g2">
+        <div class="field">
+          <label>สังกัด (กรม/กองพัน) *</label>
+          <input id="unit_main" placeholder="เช่น กรม ทพ.43">
+          <div class="err" id="e_unit_main">กรุณากรอกสังกัด</div>
+        </div>
+        <div class="field">
+          <label>หน่วยงานที่ปฏิบัติงานจริง *</label>
+          <input id="unit_actual" placeholder="เช่น ร้อย ค. กองพัน ทพ.4301">
+          <div class="err" id="e_unit_actual">กรุณากรอกหน่วยงานจริง</div>
+        </div>
+      </div>
+      <div class="grid g2">
+        <div class="field">
+          <label>จังหวัดที่ตั้งหน่วย *</label>
+          <select id="province">
+            <option value="">-- เลือก --</option>
+            <option>กรุงเทพมหานคร</option><option>กระบี่</option><option>กาญจนบุรี</option><option>กาฬสินธุ์</option><option>กำแพงเพชร</option><option>ขอนแก่น</option><option>จันทบุรี</option><option>ฉะเชิงเทรา</option><option>ชลบุรี</option><option>ชัยนาท</option><option>ชัยภูมิ</option><option>ชุมพร</option><option>เชียงราย</option><option>เชียงใหม่</option><option>ตรัง</option><option>ตราด</option><option>ตาก</option><option>นครนายก</option><option>นครปฐม</option><option>นครพนม</option><option>นครราชสีมา</option><option>นครศรีธรรมราช</option><option>นครสวรรค์</option><option>นนทบุรี</option><option>นราธิวาส</option><option>น่าน</option><option>บึงกาฬ</option><option>บุรีรัมย์</option><option>ปทุมธานี</option><option>ประจวบคีรีขันธ์</option><option>ปราจีนบุรี</option><option>ปัตตานี</option><option>พระนครศรีอยุธยา</option><option>พะเยา</option><option>พังงา</option><option>พัทลุง</option><option>พิจิตร</option><option>พิษณุโลก</option><option>เพชรบุรี</option><option>เพชรบูรณ์</option><option>แพร่</option><option>ภูเก็ต</option><option>มหาสารคาม</option><option>มุกดาหาร</option><option>แม่ฮ่องสอน</option><option>ยโสธร</option><option>ยะลา</option><option>ร้อยเอ็ด</option><option>ระนอง</option><option>ระยอง</option><option>ราชบุรี</option><option>ลพบุรี</option><option>ลำปาง</option><option>ลำพูน</option><option>เลย</option><option>ศรีสะเกษ</option><option>สกลนคร</option><option>สงขลา</option><option>สตูล</option><option>สมุทรปราการ</option><option>สมุทรสงคราม</option><option>สมุทรสาคร</option><option>สระแก้ว</option><option>สระบุรี</option><option>สิงห์บุรี</option><option>สุโขทัย</option><option>สุพรรณบุรี</option><option>สุราษฎร์ธานี</option><option>สุรินทร์</option><option>หนองคาย</option><option>หนองบัวลำภู</option><option>อ่างทอง</option><option>อำนาจเจริญ</option><option>อุดรธานี</option><option>อุตรดิตถ์</option><option>อุทัยธานี</option><option>อุบลราชธานี</option>
+          </select>
+          <div class="err" id="e_province">กรุณาเลือกจังหวัด</div>
+        </div>
+        <div class="field">
+          <label>ระบุสังกัดเพิ่มเติม (กรณีไม่มีในตัวเลือก)</label>
+          <input id="unit_extra" placeholder="ระบุสังกัดของท่าน">
+        </div>
+      </div>
+      <div class="sec-label">ตำแหน่งและที่อยู่หน่วย</div>
+      <div class="grid g1">
+        <div class="field">
+          <label>ตำแหน่งตามคำสั่งกองทัพบก *</label>
+          <input id="position_order" placeholder="เช่น ผู้บังคับหมวดปืนเล็ก">
+          <div class="err" id="e_position_order">กรุณากรอกตำแหน่ง</div>
+        </div>
+      </div>
+      <div class="grid g1">
+        <div class="field">
+          <label>ปัจจุบันปฏิบัติหน้าที่ *</label>
+          <input id="position_actual" placeholder="เช่น ผู้บังคับหมู่ / ช่วยราชการ">
+          <div class="err" id="e_position_actual">กรุณากรอกหน้าที่ปัจจุบัน</div>
+        </div>
+      </div>
+      <div class="grid g2">
+        <div class="field">
+          <label>ที่อยู่หน่วย *</label>
+          <input id="unit_addr" placeholder="ที่อยู่หน่วยงาน">
+          <div class="err" id="e_unit_addr">กรุณากรอกที่อยู่หน่วย</div>
+        </div>
+        <div class="field">
+          <label>โทรศัพท์ (ทบ.)</label>
+          <input id="tel_army" placeholder="เช่น 2-xxxx">
+        </div>
+      </div>
+      <div class="row">
+        <button class="btn" onclick="go(0)">← ย้อนกลับ</button>
+        <button class="btn pri" onclick="go(2)">ถัดไป →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step" id="s2">
+      <div class="step-title">ที่อยู่ส่วนตัว / การศึกษา / การติดต่อ</div>
+      <div class="sec-label">ที่อยู่และการติดต่อ</div>
+      <div class="grid g1">
+        <div class="field">
+          <label>ที่อยู่ปัจจุบัน *</label>
+          <textarea id="home_addr" placeholder="บ้านเลขที่ ถนน แขวง/ตำบล เขต/อำเภอ จังหวัด รหัสไปรษณีย์"></textarea>
+          <div class="err" id="e_home_addr">กรุณากรอกที่อยู่</div>
+        </div>
+      </div>
+      <div class="grid g3">
+        <div class="field">
+          <label>เบอร์โทรศัพท์ส่วนตัว *</label>
+          <input id="phone" placeholder="08x-xxx-xxxx">
+          <div class="err" id="e_phone">กรุณากรอกเบอร์โทร</div>
+        </div>
+        <div class="field">
+          <label>E-Mail</label>
+          <input id="email" type="email" placeholder="example@mail.com">
+        </div>
+        <div class="field">
+          <label>Line ID</label>
+          <input id="line_id" placeholder="Line ID">
+        </div>
+      </div>
+      <div class="grid g1">
+        <div class="field">
+          <label>บุคคลติดต่อกรณีฉุกเฉิน (ชื่อ-สกุล / เบอร์โทร) *</label>
+          <input id="emergency" placeholder="เช่น นางสมศรี ใจดี / 081-234-5678">
+          <div class="err" id="e_emergency">กรุณากรอกข้อมูลผู้ติดต่อฉุกเฉิน</div>
+        </div>
+      </div>
+      <div class="sec-label">คุณวุฒิ / การศึกษา</div>
+      <div class="grid g3">
+        <div class="field">
+          <label>คุณวุฒิสูงสุด *</label>
+          <select id="edu">
+            <option value="">-- เลือก --</option><option>ม.3</option><option>ม.6</option><option>ปวช.</option><option>ปวส.</option><option>ปริญญาตรี</option><option>ปริญญาโท</option><option>ปริญญาเอก</option>
+          </select>
+          <div class="err" id="e_edu">กรุณาเลือกคุณวุฒิ</div>
+        </div>
+        <div class="field">
+          <label>สถาบันการศึกษา *</label>
+          <input id="edu_school" placeholder="ชื่อสถาบัน">
+          <div class="err" id="e_edu_school">กรุณากรอกสถาบัน</div>
+        </div>
+        <div class="field">
+          <label>ปีการศึกษาที่จบ *</label>
+          <input id="edu_year" type="number" min="2500" max="2580" placeholder="พ.ศ.">
+          <div class="err" id="e_edu_year">กรุณากรอกปีที่จบ</div>
+        </div>
+      </div>
+      <div class="sec-label">ความต้องการขณะฝึกอบรม</div>
+      <div class="grid g3">
+        <div class="field">
+          <label>ความต้องการห้องพัก *</label>
+          <select id="room">
+            <option value="">-- เลือก --</option><option>ต้องการห้องพัก</option><option>ไม่ต้องการห้องพัก</option>
+          </select>
+          <div class="err" id="e_room">กรุณาเลือก</div>
+        </div>
+        <div class="field">
+          <label>การรับค่าเบี้ยเลี้ยง *</label>
+          <select id="allowance">
+            <option value="">-- เลือก --</option><option>รับค่าเบี้ยเลี้ยง</option><option>ไม่รับค่าเบี้ยเลี้ยง</option>
+          </select>
+          <div class="err" id="e_allowance">กรุณาเลือก</div>
+        </div>
+        <div class="field">
+          <label>ระดับความเร่งด่วน *</label>
+          <select id="urgency">
+            <option value="">-- เลือก --</option><option>ด่วนที่สุด</option><option>ด่วนมาก</option><option>ด่วน</option><option>ปกติ</option>
+          </select>
+          <div class="err" id="e_urgency">กรุณาเลือก</div>
+        </div>
+      </div>
+      <div class="row">
+        <button class="btn" onclick="go(1)">← ย้อนกลับ</button>
+        <button class="btn pri" onclick="go(3)">ดูสรุปข้อมูล →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4 สรุป -->
+    <div class="step" id="s3">
+      <div class="step-title">ตรวจสอบและยืนยันข้อมูล</div>
+      <div class="edit-note">📋 ตรวจสอบข้อมูลให้ครบถ้วน — หากต้องการแก้ไขกด "แก้ไขข้อมูล" ได้เลย</div>
+      <div id="toast-ok" class="toast ok">✅ ส่งข้อมูลเข้า Google Sheets สำเร็จแล้ว!</div>
+      <div id="toast-er" class="toast er">❌ เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง</div>
+      <div id="sum"></div>
+      <div class="row">
+        <button class="btn" onclick="go(2)">← แก้ไขข้อมูล</button>
+        <button class="btn grn" onclick="dlPDF()">⬇ ดาวน์โหลด PDF</button>
+        <button class="btn pri" id="btn-sub" onclick="submitData()">✓ ส่งข้อมูล</button>
+      </div>
+    </div>
+
+  </div><!-- /body -->
+</div><!-- /container -->
+
+<script>
+// ===== CONFIG =====
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzTKTm91SYAJ1SfR6cX_lLFMRN5A__UizuGBBSBptHAZ95SWSpXymqR2Ilu_7yVoTAjKg/exec';
+// ==================
+
+const $ = id => document.getElementById(id);
+const g = id => {
+  const el = $(id); if (!el) return '';
+  if (el.value.trim() === 'other') {
+    const ot = $(id + '_other');
+    return ot ? ot.value.trim() : '';
+  }
+  return el.value.trim();
+};
+
+const psteps = [0,1,2,3].map(i => $('ps'+i));
+const steps  = [0,1,2,3].map(i => $('s'+i));
+
+function toggleOther(id) {
+  const sel = $(id), ot = $(id + '_other');
+  if (sel && ot) ot.classList.toggle('show', sel.value === 'other');
+}
+
+const required = {
+  0: ['rank','name_th','name_en','dob','gender','origin'],
+  1: ['unit_main','unit_actual','province','position_order','position_actual','unit_addr'],
+  2: ['home_addr','phone','emergency','edu','edu_school','edu_year','room','allowance','urgency']
+};
+
+function showErr(id, show) { const e = $('e_'+id); if(e) e.style.display = show ? 'block' : 'none'; }
+
+function validate(step) {
+  let ok = true;
+  (required[step]||[]).forEach(id => {
+    const el = $(id);
+    let valid = el && el.value.trim() !== '';
+    if (el && el.value.trim() === 'other') {
+      const ot = $(id+'_other');
+      valid = ot && ot.value.trim() !== '';
+    }
+    showErr(id, !valid);
+    if (!valid) ok = false;
+  });
+  return ok;
+}
+
+function go(n) {
+  const cur = steps.findIndex(s => s.classList.contains('active'));
+  if (n > cur && !validate(cur)) return;
+  steps.forEach((s,i) => s.classList.toggle('active', i===n));
+  psteps.forEach((p,i) => p.classList.toggle('done', i<=n));
+  if (n === 3) buildSum();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function buildSum() {
+  const secs = [
+    {t:'ข้อมูลส่วนตัว', rows:[
+      ['ยศ',g('rank')],['ชื่อ-นามสกุล (ไทย)',g('name_th')],
+      ['Rank Name-Surname (EN)',g('name_en')],['วัน/เดือน/ปี เกิด',g('dob')],
+      ['เพศ',g('gender')],['กรุ๊ปเลือด',g('blood')||'-'],
+      ['อายุ',g('age')||'-'],['ศาสนา',g('religion')||'-'],
+      ['สถานภาพ',g('status')||'-'],['กำเนิด',g('origin')],
+      ['รุ่น',g('generation')||'-'],['เหล่า',g('corps')||'-'],
+    ]},
+    {t:'ข้อมูลหน่วยและตำแหน่ง', rows:[
+      ['สังกัด (กรม/กองพัน)',g('unit_main')],
+      ['หน่วยงานปฏิบัติงานจริง',g('unit_actual')],
+      ['จังหวัดที่ตั้งหน่วย',g('province')],
+      ['สังกัดเพิ่มเติม',g('unit_extra')||'-'],
+      ['ตำแหน่งตามคำสั่ง ทบ.',g('position_order')],
+      ['ปัจจุบันปฏิบัติหน้าที่',g('position_actual')],
+      ['ที่อยู่หน่วย',g('unit_addr')],
+      ['โทรศัพท์ (ทบ.)',g('tel_army')||'-'],
+    ]},
+    {t:'ที่อยู่และการติดต่อ', rows:[
+      ['ที่อยู่ปัจจุบัน',g('home_addr')],
+      ['เบอร์โทรศัพท์ส่วนตัว',g('phone')],
+      ['E-Mail',g('email')||'-'],['Line ID',g('line_id')||'-'],
+      ['ติดต่อกรณีฉุกเฉิน',g('emergency')],
+    ]},
+    {t:'การศึกษา', rows:[
+      ['คุณวุฒิสูงสุด',g('edu')],
+      ['สถาบันการศึกษา',g('edu_school')],
+      ['ปีการศึกษาที่จบ',g('edu_year')],
+    ]},
+    {t:'ความต้องการขณะฝึกอบรม', rows:[
+      ['ห้องพักขณะอบรม',g('room')],
+      ['การรับค่าเบี้ยเลี้ยง',g('allowance')],
+      ['ระดับความเร่งด่วน',g('urgency')],
+    ]},
+  ];
+  $('sum').innerHTML = secs.map(s => `
+    <div class="sum-card">
+      <h3>${s.t}</h3>
+      ${s.rows.map(([l,v]) => `<div class="sum-row"><span class="lb">${l}</span><span class="vl">${v||'-'}</span></div>`).join('')}
+    </div>`).join('');
+}
+
+function getData() {
+  return {
+    rank:g('rank'), name_th:g('name_th'), name_en:g('name_en'),
+    dob:g('dob'), gender:g('gender'), blood:g('blood'), age:g('age'),
+    religion:g('religion'), status:g('status'),
+    origin:g('origin'), generation:g('generation'), corps:g('corps'),
+    unit_main:g('unit_main'), unit_actual:g('unit_actual'), province:g('province'),
+    unit_extra:g('unit_extra'), position_order:g('position_order'),
+    position_actual:g('position_actual'), unit_addr:g('unit_addr'), tel_army:g('tel_army'),
+    home_addr:g('home_addr'), phone:g('phone'), email:g('email'),
+    line_id:g('line_id'), emergency:g('emergency'),
+    edu:g('edu'), edu_school:g('edu_school'), edu_year:g('edu_year'),
+    room:g('room'), allowance:g('allowance'), urgency:g('urgency')
+  };
+}
+
+function submitData() {
+  const btn = $('btn-sub');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span>กำลังส่ง...';
+  $('toast-ok').classList.remove('show');
+  $('toast-er').classList.remove('show');
+
+  fetch(SHEET_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(getData())
+  }).then(() => {
+    btn.innerHTML = '✓ ส่งข้อมูลแล้ว';
+    btn.style.background = '#15803d';
+    btn.disabled = false;
+    $('toast-ok').classList.add('show');
+    window.scrollTo({top:0, behavior:'smooth'});
+  }).catch(() => {
+    btn.innerHTML = '✓ ส่งข้อมูล';
+    btn.disabled = false;
+    $('toast-er').classList.add('show');
+  });
+}
+
+function dlPDF() {
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF({unit:'mm', format:'a4'});
+  const ml=18, mr=192, cw=174;
+  let y = 18;
+  const chk = n => { if (y+n > 280) { doc.addPage(); y=18; } };
+
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(14); doc.setTextColor(26,58,107);
+  doc.text('แบบฟอร์มสมัครเข้ารับการฝึกอบรม', 105, y, {align:'center'});
+  y += 5;
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(120,120,120);
+  doc.text('วันที่: ' + new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'}), 105, y, {align:'center'});
+  y += 6;
+  doc.setDrawColor(26,92,150); doc.setLineWidth(0.5); doc.line(ml,y,mr,y); y += 7;
+
+  const secs = [
+    {t:'1. ข้อมูลส่วนตัว', rows:[
+      ['ยศ',g('rank')],['ชื่อ-นามสกุล (ไทย)',g('name_th')],
+      ['Rank Name-Surname (EN)',g('name_en')],['วัน/เดือน/ปี เกิด',g('dob')],
+      ['เพศ',g('gender')],['กรุ๊ปเลือด',g('blood')||'-'],
+      ['อายุ',g('age')||'-'],['ศาสนา',g('religion')||'-'],
+      ['สถานภาพ',g('status')||'-'],['กำเนิด',g('origin')],
+      ['รุ่น',g('generation')||'-'],['เหล่า',g('corps')||'-'],
+    ]},
+    {t:'2. ข้อมูลหน่วยและตำแหน่ง', rows:[
+      ['สังกัด (กรม/กองพัน)',g('unit_main')],
+      ['หน่วยงานปฏิบัติงานจริง',g('unit_actual')],
+      ['จังหวัดที่ตั้งหน่วย',g('province')],
+      ['สังกัดเพิ่มเติม',g('unit_extra')||'-'],
+      ['ตำแหน่งตามคำสั่ง ทบ.',g('position_order')],
+      ['ปัจจุบันปฏิบัติหน้าที่',g('position_actual')],
+      ['ที่อยู่หน่วย',g('unit_addr')],
+      ['โทรศัพท์ (ทบ.)',g('tel_army')||'-'],
+    ]},
+    {t:'3. ที่อยู่และการติดต่อ', rows:[
+      ['ที่อยู่ปัจจุบัน',g('home_addr')],
+      ['เบอร์โทรศัพท์ส่วนตัว',g('phone')],
+      ['E-Mail',g('email')||'-'],['Line ID',g('line_id')||'-'],
+      ['ติดต่อกรณีฉุกเฉิน',g('emergency')],
+    ]},
+    {t:'4. การศึกษา', rows:[
+      ['คุณวุฒิสูงสุด',g('edu')],
+      ['สถาบันการศึกษา',g('edu_school')],
+      ['ปีการศึกษาที่จบ',g('edu_year')],
+    ]},
+    {t:'5. ความต้องการขณะฝึกอบรม', rows:[
+      ['ห้องพักขณะอบรม',g('room')],
+      ['การรับค่าเบี้ยเลี้ยง',g('allowance')],
+      ['ระดับความเร่งด่วน',g('urgency')],
+    ]},
+  ];
+
+  secs.forEach(sec => {
+    chk(12);
+    doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(26,92,150);
+    doc.text(sec.t, ml, y); y += 4;
+    doc.setDrawColor(180,180,180); doc.setLineWidth(0.2); doc.line(ml,y,mr,y); y += 3;
+    sec.rows.forEach(([lbl,val]) => {
+      const vStr = val||'-';
+      const lines = doc.setFont('helvetica','normal').setFontSize(8.5).splitTextToSize(vStr, cw-48);
+      const rh = Math.max(5.5, lines.length*4.5+1);
+      chk(rh+1);
+      doc.setTextColor(110,110,110); doc.text(lbl, ml, y);
+      doc.setTextColor(30,30,30); doc.text(lines, ml+48, y);
+      y += rh;
+    });
+    y += 5;
+  });
+
+  chk(20);
+  doc.setDrawColor(150,150,150); doc.setLineWidth(0.3);
+  doc.line(ml, y, ml+55, y);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(120,120,120);
+  doc.text('ลายมือชื่อผู้สมัคร', ml, y+4);
+  doc.line(mr-55, y, mr, y);
+  doc.text('วันที่', mr-55, y+4);
+
+  const fname = (g('rank')+' '+g('name_th')).replace(/\s+/g,'_') || 'applicant';
+  doc.save('application_'+fname+'.pdf');
+}
+</script>
+</body>
+</html>
