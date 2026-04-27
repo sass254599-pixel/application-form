@@ -335,8 +335,8 @@
       <div id="toast-er" class="toast er">❌ เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง</div>
       <div id="sum"></div>
       <div class="row">
-        <button class="btn" onclick="go(2)">← แก้ไขข้อมูล</button>
-        <button class="btn grn" onclick="dlPDF()">⬇ ดาวน์โหลด PDF</button>
+        <button class="btn" id="btn-back" onclick="go(2)">← แก้ไขข้อมูล</button>
+        <button class="btn grn" id="btn-dl" onclick="dlPDF()" style="display:none">⬇ ดาวน์โหลด PDF</button>
         <button class="btn pri" id="btn-sub" onclick="submitData()">✓ ส่งข้อมูล</button>
       </div>
     </div>
@@ -472,9 +472,9 @@ function submitData() {
     headers: {'Content-Type':'application/json'},
     body: JSON.stringify(getData())
   }).then(() => {
-    btn.innerHTML = '✓ ส่งข้อมูลแล้ว';
-    btn.style.background = '#15803d';
-    btn.disabled = false;
+    btn.style.display = 'none';
+    $('btn-back').style.display = 'none';
+    $('btn-dl').style.display = 'inline-block';
     $('toast-ok').classList.add('show');
     window.scrollTo({top:0, behavior:'smooth'});
   }).catch(() => {
