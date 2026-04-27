@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>แบบฟอร์มสมัครเข้ารับการฝึกอบรม</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Sarabun',sans-serif;background:#f4f6f9;color:#1a1a2e;font-size:14px;padding:20px}
@@ -485,24 +484,9 @@ function submitData() {
 }
 
 function dlPDF() {
-  const {jsPDF} = window.jspdf;
-  const doc = new jsPDF({unit:'mm', format:'a4'});
-  const ml=18, mr=192, cw=174;
-  let y = 18;
-  const chk = n => { if (y+n > 280) { doc.addPage(); y=18; } };
-
-  doc.setFont('helvetica','bold');
-  doc.setFontSize(14); doc.setTextColor(26,58,107);
-  doc.text('แบบฟอร์มสมัครเข้ารับการฝึกอบรม', 105, y, {align:'center'});
-  y += 5;
-  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(120,120,120);
-  doc.text('วันที่: ' + new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'}), 105, y, {align:'center'});
-  y += 6;
-  doc.setDrawColor(26,92,150); doc.setLineWidth(0.5); doc.line(ml,y,mr,y); y += 7;
-
   const secs = [
     {t:'1. ข้อมูลส่วนตัว', rows:[
-      ['ยศ',g('rank')],['ชื่อ-นามสกุล (ไทย)',g('name_th')],
+      ['ยศ',g('rank')],['ชื่อ-นามสกุล (ภาษาไทย)',g('name_th')],
       ['Rank Name-Surname (EN)',g('name_en')],['วัน/เดือน/ปี เกิด',g('dob')],
       ['เพศ',g('gender')],['กรุ๊ปเลือด',g('blood')||'-'],
       ['อายุ',g('age')||'-'],['ศาสนา',g('religion')||'-'],
@@ -537,33 +521,47 @@ function dlPDF() {
     ]},
   ];
 
-  secs.forEach(sec => {
-    chk(12);
-    doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(26,92,150);
-    doc.text(sec.t, ml, y); y += 4;
-    doc.setDrawColor(180,180,180); doc.setLineWidth(0.2); doc.line(ml,y,mr,y); y += 3;
-    sec.rows.forEach(([lbl,val]) => {
-      const vStr = val||'-';
-      const lines = doc.setFont('helvetica','normal').setFontSize(8.5).splitTextToSize(vStr, cw-48);
-      const rh = Math.max(5.5, lines.length*4.5+1);
-      chk(rh+1);
-      doc.setTextColor(110,110,110); doc.text(lbl, ml, y);
-      doc.setTextColor(30,30,30); doc.text(lines, ml+48, y);
-      y += rh;
-    });
-    y += 5;
-  });
+  const today = new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
+  const name = g('rank') + ' ' + g('name_th');
 
-  chk(20);
-  doc.setDrawColor(150,150,150); doc.setLineWidth(0.3);
-  doc.line(ml, y, ml+55, y);
-  doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(120,120,120);
-  doc.text('ลายมือชื่อผู้สมัคร', ml, y+4);
-  doc.line(mr-55, y, mr, y);
-  doc.text('วันที่', mr-55, y+4);
+  const rows = secs.map(sec => `
+    <tr><td colspan="2" class="sec-head">${sec.t}</td></tr>
+    ${sec.rows.map(([l,v]) => `<tr><td class="lbl">${l}</td><td class="val">${v||'-'}</td></tr>`).join('')}
+  `).join('');
 
-  const fname = (g('rank')+' '+g('name_th')).replace(/\s+/g,'_') || 'applicant';
-  doc.save('application_'+fname+'.pdf');
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600&display=swap');
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Sarabun',sans-serif; font-size:13px; color:#1a1a2e; padding:20px; }
+    .header { text-align:center; border-bottom:2px solid #1a3a6b; padding-bottom:12px; margin-bottom:16px; }
+    .header h1 { font-size:16px; color:#1a3a6b; font-weight:600; margin-bottom:4px; }
+    .header p { font-size:11px; color:#666; }
+    table { width:100%; border-collapse:collapse; }
+    .sec-head { background:#1a3a6b; color:#fff; font-weight:600; font-size:12px; padding:6px 10px; margin-top:10px; }
+    .lbl { width:42%; padding:5px 10px; color:#475569; background:#f8fafc; border-bottom:1px solid #e2e8f0; vertical-align:top; }
+    .val { padding:5px 10px; color:#1a1a2e; border-bottom:1px solid #e2e8f0; vertical-align:top; font-weight:500; }
+    .footer { margin-top:30px; display:flex; justify-content:space-between; }
+    .sig { text-align:center; }
+    .sig-line { border-top:1px solid #333; width:160px; margin:0 auto 4px; }
+    .sig p { font-size:11px; color:#666; }
+    @media print { body { padding:10px; } }
+  </style></head><body>
+  <div class="header">
+    <h1>แบบฟอร์มสมัครเข้ารับการฝึกอบรม</h1>
+    <p>วันที่: ${today}</p>
+  </div>
+  <table>${rows}</table>
+  <div class="footer">
+    <div class="sig"><div class="sig-line"></div><p>ลายมือชื่อผู้สมัคร</p><p>(${name})</p></div>
+    <div class="sig"><div class="sig-line"></div><p>วันที่</p></div>
+  </div>
+  <script>window.onload=()=>{window.print();}<\/script>
+  </body></html>`;
+
+  const w = window.open('','_blank');
+  w.document.write(html);
+  w.document.close();
 }
 </script>
 </body>
