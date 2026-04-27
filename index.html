@@ -118,8 +118,8 @@
           <div class="err" id="e_name_en">Please fill in English name</div>
         </div>
         <div class="field">
-          <label>วัน/เดือน/ปี เกิด *</label>
-          <input id="dob" type="date">
+          <label>วัน/เดือน/ปี (พ.ศ.) เกิด *</label>
+          <input id="dob" type="text" placeholder="dd/mm/พ.ศ." maxlength="10" oninput="fmtDOB(this)" onblur="calcAge(this.value)">
           <div class="err" id="e_dob">กรุณาระบุวันเกิด</div>
         </div>
       </div>
@@ -402,7 +402,7 @@ function buildSum() {
   const secs = [
     {t:'ข้อมูลส่วนตัว', rows:[
       ['ยศ',g('rank')],['ชื่อ (ไทย)',g('fname_th')],['นามสกุล (ไทย)',g('lname_th')],
-      ['Rank Name-Surname (EN)',g('name_en')],['วัน/เดือน/ปี เกิด',g('dob')],
+      ['Rank Name-Surname (EN)',g('name_en')],['วัน/เดือน/ปี (พ.ศ.) เกิด',g('dob')],
       ['เพศ',g('gender')],['กรุ๊ปเลือด',g('blood')||'-'],
       ['อายุ',g('age')||'-'],['ศาสนา',g('religion')||'-'],
       ['สถานภาพ',g('status')||'-'],['กำเนิด',g('origin')],
@@ -459,6 +459,27 @@ function submitData() {
     }).catch(() => { btn.innerHTML='✓ ส่งข้อมูล'; btn.disabled=false; $('toast-er').classList.add('show'); });
 }
 
+function calcAge(dob) {
+  if (!dob || !dob.match(/^\d{2}\/\d{2}\/\d{4}$/)) return;
+  const parts = dob.split('/');
+  const yearCE = parseInt(parts[2]) - 543; // แปลง พ.ศ. → ค.ศ.
+  const birth = new Date(yearCE, parseInt(parts[1])-1, parseInt(parts[0]));
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const m = today.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+  const ageEl = document.getElementById('age');
+  if (ageEl && age > 0 && age < 120) ageEl.value = age;
+}
+
+function fmtDOB(el) {
+  let v = el.value.replace(/[^0-9]/g,'');
+  if (v.length > 2) v = v.slice(0,2) + '/' + v.slice(2);
+  if (v.length > 5) v = v.slice(0,5) + '/' + v.slice(5);
+  if (v.length > 10) v = v.slice(0,10);
+  el.value = v;
+}
+
 function dlPDF() {
   const rankVal    = g('rank');
   const fnameVal   = g('fname_th');
@@ -466,34 +487,36 @@ function dlPDF() {
   const name       = rankVal + ' ' + fnameVal + ' ' + lnameVal;
   const today      = new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
   let dobStr = g('dob');
-  if (dobStr) {
-    const d = new Date(dobStr);
-    dobStr = d.toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
+  if (dobStr && dobStr.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+    const parts = dobStr.split('/');
+    const yearBE = parseInt(parts[2]);
+    const yearCE = yearBE - 543;
+    const d = new Date(yearCE, parseInt(parts[1])-1, parseInt(parts[0]));
+    // แสดงผลเป็น พ.ศ. โดย format เองเพราะ toLocaleDateString th-TH อาจแปลงปีอัตโนมัติ
+    const months = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
+                    'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+    dobStr = parseInt(parts[0]) + ' ' + months[d.getMonth()] + ' ' + yearBE;
   }
 
   const allRows = [
     ['ยศ - ชื่อ - สกุล',         name],
-    ['วัน/เดือน/ปี เกิด',        dobStr || '-'],
+    ['วัน/เดือน/ปี (พ.ศ.) เกิด', dobStr || '-'],
     ['อายุ',                     (g('age')||'-') + ' ปี'],
     ['เพศ',                      g('gender') || '-'],
-    ['กรุ๊ปเลือด',               g('blood') || '-'],
-    ['รุ่น',                     g('generation') || '-'],
-    ['ศาสนา',                    g('religion') || '-'],
     ['สถานภาพ',                  g('status') || '-'],
+    ['กรุ๊ปเลือด',               g('blood') || '-'],
+    ['ศาสนา',                    g('religion') || '-'],
     ['กำเนิด',                   g('origin') || '-'],
+    ['รุ่น',                     g('generation') || '-'],
     ['เหล่า',                    g('corps') || '-'],
-    ['สังกัด',                   g('unit_main') || '-'],
     ['ตำแหน่งตามคำสั่ง ทบ.',     g('position_order') || '-'],
-    ['ปัจจุบันปฏิบัติหน้าที่',   g('position_actual') || '-'],
-    ['หน่วยงานที่ปฏิบัติงาน',    g('unit_extra') || g('unit_actual') || '-'],
+    ['ปัจจุบันปฏิบัติงาน',       g('position_actual') || '-'],
     ['ที่อยู่หน่วย',             g('unit_addr') || '-'],
-    ['ที่อยู่ปัจจุบัน',          g('home_addr') || '-'],
     ['เบอร์โทรศัพท์มือถือ',     g('phone') || '-'],
     ['โทร ทบ.',                  g('tel_army') || '-'],
     ['E-mail',                   g('email') || '-'],
-    ['Line ID',                  g('line_id') || '-'],
     ['การศึกษาสูงสุด',           g('edu') + (g('edu_school') ? ' / ' + g('edu_school') : '') + (g('edu_year') ? ' / ' + g('edu_year') : '')],
-    ['บุคคลที่ติดต่อฉุกเฉิน',   g('emergency') || '-'],
+    ['บุคคลที่ติดต่อได้',        g('emergency') || '-'],
     ['ความเร่งด่วน',             g('urgency') || '-'],
   ];
 
