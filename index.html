@@ -115,7 +115,7 @@
             <option>พ.ต.</option><option>พ.ท.</option><option>พ.อ.</option><option>พ.อ. (พ.)</option>
             <option>ส.ต.หญิง</option><option>ส.ท.หญิง</option><option>ส.อ.หญิง</option>
             <option>จ.ส.ต.หญิง</option><option>จ.ส.ท.หญิง</option><option>จ.ส.อ.หญิง</option><option>จ.ส.อ.หญิง (พ.)</option>
-            <option>ร.ต.หญิง</option><option>ร.ท. หญิง</option><option>ร.อ. หญิง</option>
+            <option>ร.ต.หญิง</option><option>ร.ท.หญิง</option><option>ร.อ.หญิง</option>
             <option>พ.ต.หญิง</option><option>พ.ท.หญิง</option><option>พ.อ.หญิง</option><option>พ.อ.หญิง (พ.)</option>
             <option>นาย</option><option>นาง</option><option>นางสาว</option>
             <option value="other">อื่นๆ</option>
@@ -378,6 +378,7 @@
       <div class="row">
         <button class="btn" id="btn-back" onclick="go(2)">← แก้ไขข้อมูล</button>
         <button class="btn grn" id="btn-dl" onclick="dlPDF()" style="display:none">⬇ ดาวน์โหลด PDF</button>
+        <button class="btn" id="btn-reset" onclick="resetForm()" style="display:none">✏️ กรอกใหม่</button>
         <button class="btn pri" id="btn-sub" onclick="submitData()">✓ ส่งข้อมูล</button>
       </div>
     </div>
@@ -490,8 +491,10 @@ function submitData() {
   $('toast-ok').classList.remove('show'); $('toast-er').classList.remove('show');
   fetch(SHEET_URL, {method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(getData())})
     .then(() => {
-      btn.style.display='none'; $('btn-back').style.display='none';
+      btn.style.display='none';
+      $('btn-back').style.display='none';
       $('btn-dl').style.display='inline-block';
+      $('btn-reset').style.display='inline-block';
       $('toast-ok').classList.add('show');
       window.scrollTo({top:0,behavior:'smooth'});
     }).catch(() => { btn.innerHTML='✓ ส่งข้อมูล'; btn.disabled=false; $('toast-er').classList.add('show'); });
@@ -516,6 +519,28 @@ function fmtDOB(el) {
   if (v.length > 5) v = v.slice(0,5) + '/' + v.slice(5);
   if (v.length > 10) v = v.slice(0,10);
   el.value = v;
+}
+
+function resetForm() {
+  // Reset ทุก input/select/textarea
+  document.querySelectorAll('input, select, textarea').forEach(el => {
+    el.value = '';
+  });
+  // ซ่อน other inputs
+  document.querySelectorAll('.other-input').forEach(el => el.classList.remove('show'));
+  // ซ่อน error messages
+  document.querySelectorAll('.err').forEach(el => el.style.display = 'none');
+  // Reset toast และปุ่ม
+  $('toast-ok').classList.remove('show');
+  $('toast-er').classList.remove('show');
+  $('btn-sub').style.display = 'inline-block';
+  $('btn-sub').disabled = false;
+  $('btn-sub').innerHTML = '✓ ส่งข้อมูล';
+  $('btn-back').style.display = 'inline-block';
+  $('btn-dl').style.display = 'none';
+  $('btn-reset').style.display = 'none';
+  // กลับไปหน้าแรก
+  go(0);
 }
 
 function dlPDF() {
@@ -621,9 +646,14 @@ function dlPDF() {
     '<script>window.onload=function(){setTimeout(function(){window.print();},400);}<\/script>' +
     '</body></html>';
 
-  const w = window.open('', '_blank');
-  w.document.write(printDoc);
-  w.document.close();
+  // สร้าง blob แล้ว open ใน tab ใหม่
+  const blob = new Blob([printDoc], {type: 'text/html;charset=utf-8'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.target   = '_blank';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
 }
 
 // Init flatpickr - แสดงปี พ.ศ. ในปฏิทิน
