@@ -73,7 +73,7 @@
 <div id="closed-screen" style="display:none;position:fixed;inset:0;background:#f0f4f8;z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px">
   <img id="closed-logo" style="width:100px;margin-bottom:20px">
   <h1 id="closed-title" style="font-family:Sarabun,sans-serif;font-size:22px;color:#0d2b5e;font-weight:700;margin-bottom:8px"></h1>
-  <div style="background:#fee2e2;border:1.5px solid #fca5a5;border-radius:12px;padding:20px 32px;margin-top:16px">
+  <div class="error-box" style="background:#fee2e2;border:1.5px solid #fca5a5;border-radius:12px;padding:20px 32px;margin-top:16px">
     <p style="font-family:Sarabun,sans-serif;font-size:18px;color:#991b1b;font-weight:700">🔒 ปิดรับสมัครแล้ว</p>
     <p style="font-family:Sarabun,sans-serif;font-size:14px;color:#7f1d1d;margin-top:6px">ขณะนี้ยังไม่เปิดรับสมัคร กรุณาติดต่อเจ้าหน้าที่</p>
   </div>
@@ -623,13 +623,20 @@ function dlPDF() {
 
 // Init flatpickr - แสดงปี พ.ศ. ในปฏิทิน
 async function loadConfig() {
+  // แสดง loading ก่อน
+  document.getElementById('closed-screen').style.display  = 'flex';
+  document.getElementById('main-container').style.display = 'none';
+  document.getElementById('closed-logo').src = LOGO_SRC;
+
   try {
-    const res  = await fetch(CONFIG_URL + '?action=getConfig');
-    const cfg  = await res.json();
+    const res = await fetch(CONFIG_URL + '?action=getConfig');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const cfg = await res.json();
 
     // ชื่อหลักสูตร
     if (cfg.course_name) {
       document.querySelectorAll('.course-name').forEach(el => el.textContent = cfg.course_name);
+      document.getElementById('closed-title').textContent = cfg.course_name;
     }
 
     // เปิด/ปิดรับสมัคร
@@ -637,15 +644,14 @@ async function loadConfig() {
     document.getElementById('closed-screen').style.display  = isOpen ? 'none'  : 'flex';
     document.getElementById('main-container').style.display = isOpen ? 'block' : 'none';
 
-    // ใส่โลโก้และชื่อหลักสูตรในหน้าปิด
-    document.getElementById('closed-logo').src = LOGO_SRC;
-    if (cfg.course_name) {
-      document.getElementById('closed-title').textContent = cfg.course_name;
-    }
-  } catch(e) {
-    // ถ้าโหลด config ไม่ได้ ให้เปิดฟอร์มปกติ
-    document.getElementById('closed-screen').style.display  = 'none';
-    document.getElementById('main-container').style.display = 'block';
+  } catch(err) {
+    // โหลดไม่ได้ — แสดงหน้า error ไม่ให้เข้าฟอร์ม
+    document.getElementById('closed-screen').style.display = 'flex';
+    document.getElementById('main-container').style.display = 'none';
+    document.getElementById('closed-title').textContent = 'ไม่สามารถโหลดข้อมูลได้';
+    document.querySelector('#closed-screen .error-box').innerHTML =
+      '<p style="font-size:15px;color:#991b1b;font-weight:700">⚠️ เกิดข้อผิดพลาด</p>' +
+      '<p style="font-size:13px;color:#7f1d1d;margin-top:6px">กรุณารีเฟรชหน้านี้ใหม่อีกครั้ง</p>';
   }
 }
 
