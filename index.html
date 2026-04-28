@@ -590,45 +590,76 @@ function dlPDF() {
   w.document.close();
 }
 
-// Init flatpickr for dob - Thai Buddhist Era display
+// Init flatpickr - แสดงปี พ.ศ. ในปฏิทิน
 document.addEventListener('DOMContentLoaded', function() {
-  flatpickr('#dob', {
-    dateFormat: 'd/m/Y',       // ค.ศ. internally
+  const fp = flatpickr('#dob', {
     allowInput: true,
+    dateFormat: 'd/m/Y',
     locale: {
       firstDayOfWeek: 1,
-      weekdays: { shorthand:['อา','จ','อ','พ','พฤ','ศ','ส'], longhand:['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัส','ศุกร์','เสาร์'] },
+      weekdays: {
+        shorthand: ['อา','จ','อ','พ','พฤ','ศ','ส'],
+        longhand:  ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์']
+      },
       months: {
-        shorthand:['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'],
-        longhand:['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม']
-      }
-    },
-    onReady: function(sel, dateStr, fp) {
-      // Override year display to พ.ศ.
-      fp.calendarContainer.addEventListener('DOMSubtreeModified', function() {
-        const yr = fp.calendarContainer.querySelector('.cur-year');
-        if (yr && parseInt(yr.value) < 2500) yr.value = parseInt(yr.value) + 543;
-      });
-    },
-    onValueUpdate: function(sel, dateStr, fp) {
-      if (fp.selectedDates[0]) {
-        const d = fp.selectedDates[0];
-        const dd = String(d.getDate()).padStart(2,'0');
-        const mm = String(d.getMonth()+1).padStart(2,'0');
-        const yyyy = d.getFullYear() + 543; // แปลงเป็น พ.ศ.
-        fp.input.value = dd + '/' + mm + '/' + yyyy;
-        calcAge(fp.input.value);
+        shorthand: ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'],
+        longhand:  ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
+                    'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม']
       }
     },
     parseDate: function(dateStr) {
       if (!dateStr) return null;
-      const parts = dateStr.split('/');
-      if (parts.length === 3) {
-        const yr = parseInt(parts[2]) > 2400 ? parseInt(parts[2]) - 543 : parseInt(parts[2]);
-        return new Date(yr, parseInt(parts[1])-1, parseInt(parts[0]));
+      const p = dateStr.split('/');
+      if (p.length === 3) {
+        const y = parseInt(p[2]) > 2400 ? parseInt(p[2]) - 543 : parseInt(p[2]);
+        return new Date(y, parseInt(p[1]) - 1, parseInt(p[0]));
       }
       return null;
+    },
+    onValueUpdate: function(sel, dateStr, instance) {
+      if (instance.selectedDates[0]) {
+        const d  = instance.selectedDates[0];
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const be = d.getFullYear() + 543;
+        instance.input.value = dd + '/' + mm + '/' + be;
+        calcAge(instance.input.value);
+      }
+    },
+    onReady: function(sel, dateStr, instance) {
+      patchYearToBE(instance);
+    },
+    onMonthChange: function(sel, dateStr, instance) {
+      patchYearToBE(instance);
+    },
+    onYearChange: function(sel, dateStr, instance) {
+      patchYearToBE(instance);
     }
+  });
+
+  // แปลงปีในหัวปฏิทินให้เป็น พ.ศ.
+  function patchYearToBE(instance) {
+    if (!instance.calendarContainer) return;
+    const yearInput = instance.calendarContainer.querySelector('.cur-year');
+    if (yearInput) {
+      const ce = parseInt(yearInput.value);
+      if (ce < 2500) {
+        yearInput.value = ce + 543;
+        // ป้องกันไม่ให้ flatpickr reset กลับ
+        yearInput.addEventListener('change', function onYrChange() {
+          const v = parseInt(this.value);
+          if (v > 2400) instance.changeYear(v - 543);
+        }, { once: true });
+      }
+    }
+  }
+
+  // ให้ input พิมพ์ได้แบบ dd/mm/พ.ศ. และ patch ปฏิทินหลัง open
+  document.getElementById('dob').addEventListener('input', function() {
+    fmtDOB(this);
+  });
+  document.getElementById('dob').addEventListener('click', function() {
+    setTimeout(function() { if(fp) patchYearToBE(fp); }, 50);
   });
 });
 </script>
